@@ -11,8 +11,8 @@ export function options(layers: Layers,
                         layersNames: string[],
                         onLayerChange: (layer: string) => void) {
     const scale = layers.getScale();
-    const size = ButtonSize * scale;
-    const ident = size / 4;
+    const size = Math.round(ButtonSize * scale);
+    const ident = Math.round(size / 4);
 
     let controlsVisbile = false;
     let keyboardVisible = false;

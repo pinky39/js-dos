@@ -143,19 +143,19 @@ export function button(layers: Layers,
             const right = next.position.right;
 
             if (left !== undefined) {
-                button.style.left = ((ident * left) + (ident + size) * (left - 1)) + "px";
+                button.style.left = (ident * left + size * (left - 1)) + "px";
             }
 
             if (right !== undefined) {
-                button.style.right = ((ident * right) + (ident + size) * (right - 1)) + "px";
+                button.style.right = (ident * right + size * (right - 1)) + "px";
             }
 
             if (top !== undefined) {
-                button.style.top = ((ident * top) + (ident + size) * (top - 1)) + "px";
+                button.style.top = (ident * top + size * (top - 1)) + "px";
             }
 
             if (bottom !== undefined) {
-                button.style.bottom = ((ident * bottom) + (ident + size) * (bottom - 1)) + "px";
+                button.style.bottom = (ident * bottom + size * (bottom - 1)) + "px";
             }
         }
         layers.mouseOverlay.appendChild(button);
