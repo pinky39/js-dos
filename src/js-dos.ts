@@ -32,7 +32,7 @@ export class DosInstance {
     constructor(root: HTMLDivElement, emulatorsUi: EmulatorsUi, options: DosOptions) {
         if (DosInstance.initialRun) {
             emulators.cacheSeed += " ui (" + Build.short + ")";
-            DosInstance.initialRun = false; 
+            DosInstance.initialRun = false;
         }
 
         this.emulatorsUi = emulatorsUi;
@@ -44,8 +44,8 @@ export class DosInstance {
 
     async run(bundleUrl: string, optionalChangesUrl?: string): Promise<CommandInterface> {
         await this.stop();
-        const changesUrl = optionalChangesUrl || bundleUrl + ".changed";
         const emulatorsUi = this.emulatorsUi;
+        const persistKey = bundleUrl + ".changes";
         if (this.emulatorFunction === "janus") {
             this.layers.setLoadingMessage("Connecting...");
             this.ciPromise = emulators[this.emulatorFunction](bundleUrl);
@@ -55,7 +55,12 @@ export class DosInstance {
                 onprogress: (percent) => this.layers.setLoadingMessage("Downloading bundle " + percent + "%"),
             });
             try {
-                const changesBundle = await emulatorsUi.persist.load(changesUrl, emulators);
+                let changesBundle: Uint8Array | undefined;
+                if (optionalChangesUrl !== undefined && optionalChangesUrl !== null && optionalChangesUrl.length > 0) {
+                    changesBundle = await emulatorsUi.network.resolveBundle(optionalChangesUrl);
+                } else {
+                    changesBundle = await emulatorsUi.persist.load(persistKey, emulators);
+                }
                 const bundle = await bundlePromise;
                 this.ciPromise = emulators[this.emulatorFunction]([bundle, changesBundle]);
             } catch {
@@ -78,7 +83,7 @@ export class DosInstance {
         if (this.emulatorFunction === "janus") {
             emulatorsUi.graphics.video(this.layers, ci);
         } else {
-            emulatorsUi.persist.save(changesUrl, this.layers, ci, emulators);
+            emulatorsUi.persist.save(persistKey, this.layers, ci, emulators);
             emulatorsUi.graphics.webGl(this.layers, ci);
             emulatorsUi.sound.audioNode(ci);
         }

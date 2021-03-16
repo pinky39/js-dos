@@ -3,7 +3,7 @@ import { Layers } from "../dom/layers";
 import { namedKeyCodes, KBD_NONE } from "../dom/keys";
 import { pointer } from "./pointer";
 
-export const ButtonSize = 52;
+export const ButtonSize = 54;
 
 export type ActionType = "click" | "hold";
 // hold - means track press/release events separately
@@ -40,17 +40,28 @@ export interface ButtonHandler {
 export function createButton(symbol: string,
                              handler: ButtonHandler,
                              scale: number) {
-    const size = Math.round(Math.max(16, 64 * scale));
+    const size = Math.round(Math.max(16, ButtonSize * scale));
+    const innerSize = Math.round(size / 1.8);
     const backgroundImage = symbolToUrl[symbol.toLowerCase()];
     const text = backgroundImage === undefined ? symbol : "";
-    const button = createDiv("emulator-button", text === undefined ? "□" : text);
+    const button = createDiv("emulator-button-touch-zone");
+    const innerButton = createDiv("emulator-button", text === undefined ? "□" : text);
+
     if (backgroundImage !== undefined) {
-        button.style.backgroundImage = "url(\"" + backgroundImage + "\")";
+        innerButton.style.backgroundImage = "url(\"" + backgroundImage + "\")";
     }
+    innerButton.style.width = innerSize + "px";
+    innerButton.style.height = innerSize + "px";
+    innerButton.style.lineHeight = innerSize + "px";
+    innerButton.style.fontSize = Math.round(innerSize / 2) + "px";
+
     button.style.width = size + "px";
     button.style.height = size + "px";
     button.style.lineHeight = size + "px";
-    button.style.fontSize = size / 2 + "px";
+    button.style.fontSize = Math.round(size / 2) + "px";
+    button.style.borderWidth = Math.max(1, Math.round(size / 20)) + "px";
+    button.appendChild(innerButton);
+
     const onStart = (e: Event) => {
         if (handler.onDown !== undefined) {
             handler.onDown();
@@ -97,8 +108,8 @@ export function button(layers: Layers,
                        ci: CommandInterface,
                        buttons: Button[]) {
     const scale = layers.getScale();
-    const size = ButtonSize * scale;
-    const ident = size / 4;
+    const size = Math.round(ButtonSize * scale);
+    const ident = Math.round(size / 4);
     const toRemove: HTMLElement[] = [];
 
     for (const next of buttons) {
@@ -162,10 +173,12 @@ export function button(layers: Layers,
     return exitFn;
 }
 
-function createDiv(className: string, innerHtml: string) {
+function createDiv(className: string, innerHtml?: string) {
     const el = document.createElement("div");
     el.className = className;
-    el.innerHTML = innerHtml;
+    if (innerHtml !== undefined) {
+        el.innerHTML = innerHtml;
+    }
     return el;
 }
 

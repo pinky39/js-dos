@@ -52,7 +52,7 @@ export function options(layers: Layers,
     };
 
     const updateVisibility = () => {
-        const display = controlsVisbile ? "block" : "none";
+        const display = controlsVisbile ? "flex" : "none";
         for (const next of children) {
             if (next == options) {
                 continue;
@@ -107,8 +107,8 @@ export function options(layers: Layers,
         }, scale)
     ];
     const options = children[children.length - 1];
-    const fullscreen = children[children.length - 2];
-    const keyboard = children[children.length - 4];
+    const fullscreen = children[children.length - 2].children[0];
+    const keyboard = children[children.length - 4].children[0];
 
     layers.setOnFullscreen((fullscreenEnabled) => {
         if (fullscreenEnabled) {

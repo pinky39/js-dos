@@ -33,8 +33,8 @@ export class EmulatorsUi {
     };
 
     persist = {
-        save, // store updated bundle into `emulators.cache`
-        load, // get updated bundle form `emulators.cache`
+        save, // store updated bundle into 'persist.db'
+        load, // get updated bundle form `persist.db`
     };
 
     controls = {
