@@ -5,6 +5,7 @@ import { Button } from "./controls/button";
 import { EventMapping } from "./controls/nipple";
 import { Mapper } from "./controls/keyboard";
 import { Build } from "./build";
+import { MouseMode, MouseProps } from "./controls/mouse";
 
 declare const emulators: Emulators;
 
@@ -119,16 +120,21 @@ export class DosInstance {
                 return;
             }
 
+            const mouseProps: MouseProps = {
+                pointerButton: 0,
+                mode: MouseMode.DEFAULT,
+            };
+
             unbind.keyboard = emulatorsUi.controls.keyboard(this.layers, ci, layer.mapper);
 
             if (layer.gestures !== undefined && layer.gestures.length > 0) {
                 unbind.gestures = emulatorsUi.controls.nipple(this.layers, ci, layer.gestures);
             } else {
-                unbind.mouse = emulatorsUi.controls.mouse(this.layers, ci);
+                unbind.mouse = emulatorsUi.controls.mouse(this.layers, ci, mouseProps);
             }
 
             if (layer.buttons !== undefined && layer.buttons.length) {
-                unbind.buttons = emulatorsUi.controls.button(this.layers, ci, layer.buttons);
+                unbind.buttons = emulatorsUi.controls.button(this.layers, ci, layer.buttons, mouseProps);
             }
         }
 

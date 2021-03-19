@@ -1,9 +1,20 @@
 import { CommandInterface } from "emulators";
 import { Layers } from "../dom/layers";
-import { pointer, getPointerState } from "../controls/pointer";
+import { pointer, getPointerState } from "./pointer";
+
+export enum MouseMode {
+    DEFAULT,
+    SCREEN_MOVER,
+}
+
+export interface MouseProps {
+    pointerButton: 0 | 1;
+    mode: MouseMode;
+}
 
 export function mouse(layers: Layers,
-                      ci: CommandInterface) {
+                      ci: CommandInterface,
+                      props: MouseProps) {
     const insensitivePadding = 1 / 100;
 
     function mapXY(eX: number, eY: number) {
@@ -84,7 +95,13 @@ export function mouse(layers: Layers,
         }
 
         const state = getPointerState(e, el);
-        onMouseDown(state.x, state.y, state.button);
+
+        if (props.mode === MouseMode.SCREEN_MOVER) {
+            ci.sendMouseMotion(0.5, 0.5);
+        } else {
+            onMouseDown(state.x, state.y, state.button || props.pointerButton);
+        }
+
         e.stopPropagation();
         preventDefaultIfNeeded(e);
     };
@@ -95,14 +112,25 @@ export function mouse(layers: Layers,
         }
 
         const state = getPointerState(e, el);
-        onMouseMove(state.x, state.y);
+        if (props.mode === MouseMode.SCREEN_MOVER) {
+            const { x, y } = mapXY(state.x, state.y);
+            const moveX = (x < 0.3 ? 0 : (x > 0.7 ? 1 : 0.5));
+            const moveY = (y < 0.3 ? 0 : (y > 0.7 ? 1 : 0.5));
+            ci.sendMouseMotion(moveX, moveY);
+        } else {
+            onMouseMove(state.x, state.y);
+        }
         e.stopPropagation();
         preventDefaultIfNeeded(e);
     };
 
     const onEnd = (e: Event) => {
         const state = getPointerState(e, el);
-        onMouseUp(state.x, state.y, state.button);
+        if (props.mode === MouseMode.SCREEN_MOVER) {
+            ci.sendMouseMotion(0.5, 0.5);
+        } else {
+            onMouseUp(state.x, state.y, state.button || props.pointerButton);
+        }
         e.stopPropagation();
         preventDefaultIfNeeded(e);
     };

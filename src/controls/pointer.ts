@@ -1,9 +1,10 @@
 export const pointer = initBind();
 
 function initBind() {
-    const isTouch = !!('ontouchstart' in window);
-    const isPointer = window.PointerEvent ? true : false;
-    const isMSPointer = window.MSPointerEvent ? true : false;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isTouch = isMobile && !!('ontouchstart' in window);
+    const isPointer = isMobile && (window.PointerEvent ? true : false);
+    const isMSPointer = isMobile && (window.MSPointerEvent ? true : false);
 
     const starters: string[] = [];
     const changers: string[] = [];
@@ -16,7 +17,6 @@ function initBind() {
         enders.push("pointerup", "pointercancel");
         changers.push("pointermove");
         prevents.push("touchstart", "touchmove", "touchend");
-        leavers.push("pointerleave");
     } else if (isMSPointer) {
         starters.push("MSPointerDown");
         changers.push("MSPointerMove");
@@ -44,7 +44,7 @@ function initBind() {
 export interface PointerState {
     x: number,
     y: number,
-    button: number,
+    button?: number,
 }
 
 export function getPointerState(e: Event, el: HTMLElement): PointerState {
@@ -54,21 +54,19 @@ export function getPointerState(e: Event, el: HTMLElement): PointerState {
         return {
             x: evt.targetTouches[0].clientX - rect.x,
             y: evt.targetTouches[0].clientY - rect.y,
-            button: 0,
         };
     } else if (e.type.match(/^pointer/)) {
         const evt = e as PointerEvent;
         return {
             x: evt.offsetX,
             y: evt.offsetY,
-            button: 0,
         }
     } else {
         const evt = e as MouseEvent;
         return {
             x: evt.offsetX,
             y: evt.offsetY,
-            button: 0,
+            button: evt.button === 0 ? 0 : 1,
         }
     }
 }
