@@ -6,10 +6,12 @@ declare const emulators: Emulators;
 export async function resolveBundle(url: string,
                                     options?: {
                                         cache?: Cache | null,
+                                        httpCache?: boolean,
                                         onprogress?: (progress: number) => void
                                     }): Promise<Uint8Array> {
-    const cache = options?.cache;
+    const cache = options?.cache || null;
     const onprogress = options?.onprogress;
+    const httpCache = !(options?.httpCache === false);
 
     try {
         if (cache === null) {
@@ -52,6 +54,11 @@ export async function resolveBundle(url: string,
                         onprogress(porgress);
                     }
                 }
+            }
+            if (httpCache === false) {
+                request.setRequestHeader("Cache-Control", "no-cache, no-store, max-age=0");
+                request.setRequestHeader("Expires", "Tue, 01 Jan 1980 1:00:00 GMT");
+                request.setRequestHeader("Pragma", "no-cache");
             }
             request.send();
         });
