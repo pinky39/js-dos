@@ -20,7 +20,14 @@ gulp.task('clean', function () {
 });
 
 gulp.task("docco", function (cb) {
-    exec('node_modules/docco/bin/docco js-dos-ts/* js-dos-cpp/* js-dos-cpp/include/* -o dist/docs/api -l plain-markdown', function (err, stdout, stderr) {
+    
+		var isWin = process.platform === "win32";
+		if (isWin) {
+			cb();
+			return;
+		}
+		
+		exec('node_modules/docco/bin/docco js-dos-ts/* js-dos-cpp/* js-dos-cpp/include/* -o dist/docs/api -l plain-markdown', function (err, stdout, stderr) {
         console.log(stdout);
         console.log(stderr);
         cb(err);
@@ -28,7 +35,14 @@ gulp.task("docco", function (cb) {
 });
 
 gulp.task("docs", ["docco"], function (cb) {
-    exec('find dist/docs -name "*.html" -exec bash -c \'mv "$1" "${1%.html}".md\' - \'{}\' \\;', function (err, stdout, stderr) {
+    
+		var isWin = process.platform === "win32";
+		if (isWin) {
+			cb();
+			return;
+		}
+		
+		exec('find dist/docs -name "*.html" -exec bash -c \'mv "$1" "${1%.html}".md\' - \'{}\' \\;', function (err, stdout, stderr) {
         console.log(stdout);
         console.log(stderr);
         cb(err);
@@ -115,8 +129,15 @@ gulp.task('copyPackageJson', function () {
         .pipe(gulp.dest('dist'));
 })
 
-gulp.task('test', ['copyAssetsTest'], function () {
-    return browserify({
+gulp.task('test', ['copyAssetsTest'], function (cb) {
+    
+		var isWin = process.platform === "win32";
+		if (isWin) {
+			cb();
+			return;
+		}
+		
+		return browserify({
         basedir: '.',
         debug: true,
         entries: ['test/test.ts'],
