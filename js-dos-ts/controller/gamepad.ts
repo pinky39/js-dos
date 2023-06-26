@@ -16,6 +16,12 @@ export interface GamepadOptions {
 export default function Gamepad(
     ci: DosCommandInterface,
     options: GamepadOptions) {
+			
+		if (!navigator.getGamepads)
+		{
+			return;
+		}
+					
     const xBox360Buttons: string[] = [
         "a", "b", "x", "y", 				// 0, 1, 2, 3
         "lb", "rb", "lt", "rt", 			// 4, 5, 6, 7
@@ -155,8 +161,8 @@ export default function Gamepad(
         return options.gamepads[mapIndex];
     }
 
-    function scan() {
-        const gps = navigator.getGamepads();
+    function scan() {       			
+				const gps = navigator.getGamepads();
 
         for (let i = 0; i < gps.length; i++) {
 
