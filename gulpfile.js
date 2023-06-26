@@ -164,7 +164,7 @@ gulp.task('test', ['copyAssetsTest'], function (cb) {
         .pipe(gulp.dest('dist/test'));
 });
 
-gulp.task('default', ['test', 'generateBuildInfo', 'copyWasm', 'copyAssets', /* 'rewriteDefaultVersion', */
+gulp.task('default', ['test', /*'generateBuildInfo' ,*/ 'copyWasm', 'copyAssets', /* 'rewriteDefaultVersion', */
     'copyTypeScript', 'docs', 'copyPackageJson'], function () {
         return browserify({
             basedir: '.',
