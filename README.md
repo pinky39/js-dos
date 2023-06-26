@@ -713,8 +713,19 @@ You can build javascript API with gulp, just type gulp.
 // install gulp 
 npm install
 npm install gulp@3.9.1
+gulp
+```
+
+On Windows:
+Download node binary https://nodejs.org/download/release/v11.15.0/node-v11.15.0-win-x86.zip
+Unzip node and add it to path then:
+
+```
+npm install
+npm install gulp@3.9.1
 npx gulp
 ```
+
 
 Output will be placed in dist folder. Also in dist folder you can find test page, you open it in browser. All test should pass.
 ```
