@@ -41,6 +41,7 @@ validation-report.json
 node_modules
 .buildconfig
 .vscode
+.vs
 buildconfig
 cmake-build-debug
 travis-build
