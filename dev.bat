@@ -1,0 +1,1 @@
+wt.exe pwsh -NoProfile -NoLogo -NoExit -Command ". ./dev.ps1"

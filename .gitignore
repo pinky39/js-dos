@@ -42,6 +42,7 @@ node_modules
 .buildconfig
 .vscode
 .vs
+.node
 buildconfig
 cmake-build-debug
 travis-build

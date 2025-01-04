@@ -1,5 +1,5 @@
 {
-    "files": ["js-dos-ts/js-dos.ts"],
+    "files": [],
     "compilerOptions": {
         "target": "es5",
         "allowJs": false,
