@@ -203,72 +203,53 @@ export class DosFS {
         const path = this.createPath(parts, 0, parts.length - 1);
         this.fs.createDataFile(path, filename, body, true, true, true);
     }
-
-    public writeFsToFile(filename: string, fsPattern: RegExp, mountName: string) {
-
-        this.fs.syncfs(false, (err: any) => {
-            if (!err) {
-                window.indexedDB.open(mountName).onsuccess = (e: any) => {
-
-                    const db = e.target.result;
-                    const content: any = {};
-
-                    db.transaction(["FILE_DATA"], "readonly")
-                        .objectStore("FILE_DATA")
-                        .openCursor().onsuccess = (e: any) => {
-
-                            const cursor = e.target.result;
-
-                            if (cursor) {
-
-                                if (!fsPattern || fsPattern.test(cursor.key)) {
-                                    const value = cursor.value;
-                                    value.contents = DosFS.toBase64(value.contents);
-                                    const key = cursor.key;
-                                    content[key] = value;
+           
+    public read(fsPattern: RegExp, mountName: string) : Promise<any> {
+        return new Promise<any>((resolve) => {
+            this.fs.syncfs(false, (err: any) => {
+                if (!err) {
+                    window.indexedDB.open(mountName).onsuccess = (e: any) => {
+    
+                        const db = e.target.result;
+                        const content: any = {};
+    
+                        db.transaction(["FILE_DATA"], "readonly")
+                            .objectStore("FILE_DATA")
+                            .openCursor().onsuccess = (e: any) => {
+    
+                                const cursor = e.target.result;
+    
+                                if (cursor) {
+    
+                                    if (!fsPattern || fsPattern.test(cursor.key)) {
+                                        const value = cursor.value;
+                                        value.contents = DosFS.toBase64(value.contents);
+                                        const key = cursor.key;
+                                        content[key] = value;
+                                    }
+    
+                                    cursor.continue();
+                                } else {
+                                    resolve(content);                                    
                                 }
-
-                                cursor.continue();
-                            } else {
-                                DosFS.saveToFile(
-                                    filename,
-                                    JSON.stringify(content));
-                            }
-                        };
-                };
-            }
-        });
+                            };
+                    };
+                }
+            });
+        });                
     }
 
-    public readFsFromFile(file: Blob) {
-        if (!file) {
-            return;
-        }
+    public write(entries: any) {                                   
+        for (const key of Object.keys(entries)) {
+            const value = entries[key];
+            const contents = DosFS.fromBase64(value.contents);
 
-        const reader = new FileReader();
-
-        reader.onload = (e: any) => {
-
-            if (!e.target) {
-                return;
+            if (this.fs.analyzePath(key).exists) {
+                this.fs.unlink(key);
             }
 
-            const content: any = e.target.result;
-            const entries = JSON.parse(content);
-
-            for (const key of Object.keys(entries)) {
-                const value = entries[key];
-                const contents = DosFS.fromBase64(value.contents);
-
-                if (this.fs.analyzePath(key).exists) {
-                    this.fs.unlink(key);
-                }
-
-                this.createFile(key, contents);
-            }
-        };
-
-        reader.readAsText(file);
+            this.createFile(key, contents);
+        }               
     }
 
     private static toBase64(bytes: Uint8Array): string {
@@ -288,17 +269,7 @@ export class DosFS {
             bytes[i] = binaryString.charCodeAt(i);
         }
         return bytes;
-    }
-
-    private static saveToFile(filename: string, data: string) {
-        const blob = new Blob([data], {type: "text/csv"});
-        const elem = window.document.createElement("a");
-        elem.href = window.URL.createObjectURL(blob);
-        elem.download = filename;
-        document.body.appendChild(elem);
-        elem.click();
-        document.body.removeChild(elem);
-    }
+    }    
 
     private createPath(parts: string[], begin: number, end: number) {
         let path = "";
